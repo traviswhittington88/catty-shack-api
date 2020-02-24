@@ -36,11 +36,30 @@ const UsersService = {
       .then(([user]) => user)
   },
   insertImage(db, user_name, user_image) {
-    console.log(user_name)
-    console.log(user_image)
     return db('catshack_users')
       .where({ user_name })
       .update({ user_image })
+      .returning('*')
+      .then(([user]) => user)
+  },
+  reduceUserDetails(data) {
+    let userDetails = {}
+    console.log('got here', data)
+    if (data.bio.trim()) userDetails.bio = data.bio;
+    if (data.website.trim()) {
+      // http://website.com
+      if (data.website.trim().substring(0, 4) !== 'http') {
+        userDetails.website = `http://${data.website.trim()}`;
+      } else userDetails.website = data.website;
+    }
+    if (data.location.trim()) userDetails.location = data.location;
+
+    return userDetails; 
+  },
+  insertUserDetails(db, user_name, user_details) {
+    return db('catshack_users')
+      .where({ user_name })
+      .update(user_details )
       .returning('*')
       .then(([user]) => user)
   },
@@ -49,7 +68,10 @@ const UsersService = {
       id: user.id,
       user_name: xss(user.user_name),
       date_created: new Date(user.date_created),
-      user_image: xss(user.user_image)
+      user_image: xss(user.user_image),
+      bio: xss(user.bio),
+      location: xss(user.location),
+      website: xss(user.website)
     }
   }
 }

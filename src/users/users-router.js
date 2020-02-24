@@ -16,6 +16,9 @@ const fileFilter = (req, file, cb) => {
   if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
     cb(null, true);
   } else {
+    res.json({
+      error: `Wrong file type submitted. Upload only .png or .jpeg`
+    })
     cb(null, false);
   }
 }
@@ -63,6 +66,7 @@ usersRouter
               const newUser = {
                 user_name,
                 password: hashedPassword,
+                user_image: 'uploads/no-img.png',
                 date_created: 'now()',
               }
               return UsersService.insertUser(
@@ -81,21 +85,48 @@ usersRouter
       .catch(next)
     })
 
+  // upload profile image for user
   usersRouter
     .route('/image')
     .all(requireAuth)
     .post(jsonBodyParser, upload.single('profileImage'), (req, res, next) => {   
-
       UsersService.insertImage(
         req.app.get('db'),
         req.user.user_name,
         req.file.path,
       )
       .then(user => {
-        console.log(user)
-        res.end();
+        res.status(201)
+        .json(UsersService.serializeUser(user))
       }) 
-    });
+    })
+
+  // Add user details
+  
+  usersRouter
+    .route('/details')
+    .all(requireAuth)
+    .post(jsonBodyParser, (req, res, next) => {
+
+      let userDetails = UsersService.reduceUserDetails(req.body);
+      UsersService.insertUserDetails(
+        req.app.get('db'),
+        req.user.user_name,
+        userDetails
+        )
+        .then(user => {
+          if (!user) {
+            return res.status(400).json({
+              error: `That user does not exist, try again`
+            })
+          } else {
+            res
+              .status(201)
+              .json(UsersService.serializeUser(user))
+          }
+        })
+    })
+
 
 
   module.exports = usersRouter

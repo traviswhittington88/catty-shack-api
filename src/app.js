@@ -13,9 +13,9 @@ const app = express();
 const morganOption = (NODE_ENV === 'production') ? 'tiny' : 'common';
 
 app.use(morgan(morganOption))
+app.use('/uploads',express.static('uploads'))
 app.use(helmet())
 app.use(cors())
-//app.use(express.static('./public'));
 
 app.use('/api/meows', meowsRouter)
 app.use('/api/auth', authRouter)
