@@ -8,6 +8,7 @@ const jsonBodyParser = express.json();
 
 meowsRouter
   .route('/')
+  .all(requireAuth)
   .get((req, res, next) => {
     MeowsService.getAllMeows(req.app.get('db'))
       .then(meows => {
@@ -16,8 +17,9 @@ meowsRouter
       .catch(next)
   })
   .post(jsonBodyParser, (req, res, next) => {
-    const { body, userhandle } = req.body
-    const newMeow = { body, userhandle } 
+    const { body } = req.body
+    const userhandle = req.user.user_name
+    const newMeow = { body, userhandle  } 
 
     for (const [key, value] of Object.entries(newMeow)) {
       if (value == null)
@@ -41,7 +43,7 @@ meowsRouter
 
   meowsRouter
     .route('/:meow_id')
-    //.all(requireAuth)
+    .all(requireAuth)
     .get((req, res, next) => {
       MeowsService.getById(
         req.app.get('db'),

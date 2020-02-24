@@ -35,11 +35,21 @@ const UsersService = {
       .returning('*')
       .then(([user]) => user)
   },
+  insertImage(db, user_name, user_image) {
+    console.log(user_name)
+    console.log(user_image)
+    return db('catshack_users')
+      .where({ user_name })
+      .update({ user_image })
+      .returning('*')
+      .then(([user]) => user)
+  },
   serializeUser(user) {
     return {
       id: user.id,
       user_name: xss(user.user_name),
       date_created: new Date(user.date_created),
+      user_image: xss(user.user_image)
     }
   }
 }

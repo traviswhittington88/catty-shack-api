@@ -1,6 +1,31 @@
 const express = require('express')
-const path = require('path')
+const { requireAuth } = require('../middleware/jwt-auth')
 const UsersService = require('../users/users-service')
+const path = require('path')
+const multer = require('multer')
+const storage = multer.diskStorage({
+  destination: function(req, res, cb) {
+    cb(null, './uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null, new Date().toISOString() + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+}
+
+const upload = multer({ storage: storage, limits: {
+  fileSize: 1024 * 1024 * 5,
+  fileFilter: fileFilter
+} })
+
+
 
 const usersRouter = express.Router()
 const jsonBodyParser = express.json()
@@ -8,8 +33,6 @@ const jsonBodyParser = express.json()
 usersRouter
   .post('/', jsonBodyParser, (req, res, next) => {
     const { user_name, password } = req.body
-    const newUser = { user_name, password }
-
 
     for (const field of ['user_name', 'password'])
       if (!req.body[field]) 
@@ -47,6 +70,7 @@ usersRouter
                 newUser
               )
                 .then(user => {
+                  
                   res
                     .status(201)
                     .location(path.posix.join(req.originalUrl, `/${user.id}`))
@@ -54,9 +78,24 @@ usersRouter
                 })
             })
           })
-      
       .catch(next)
     })
+
+  usersRouter
+    .route('/image')
+    .all(requireAuth)
+    .post(jsonBodyParser, upload.single('profileImage'), (req, res, next) => {   
+
+      UsersService.insertImage(
+        req.app.get('db'),
+        req.user.user_name,
+        req.file.path,
+      )
+      .then(user => {
+        console.log(user)
+        res.end();
+      }) 
+    });
 
 
   module.exports = usersRouter
