@@ -53,6 +53,7 @@ const MeowsService = {
     return db('comments')
       .select('*')
       .where({ meow_id })
+      .orderBy('date_created', 'desc')
   }
 }
 

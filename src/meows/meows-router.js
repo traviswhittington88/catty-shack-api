@@ -60,7 +60,7 @@ meowsRouter
           })
         }
         res.meow = meow
-        meowData.meow_id = req.params.meow_id 
+        meowData = meow;
         
         MeowsService.getComments(
           req.app.get('db'),
