@@ -45,6 +45,8 @@ meowsRouter
     .route('/:meow_id')
     .all(requireAuth)
     .get((req, res, next) => {
+      let meowData = {};
+
       MeowsService.getById(
         req.app.get('db'),
         req.params.meow_id
@@ -58,12 +60,26 @@ meowsRouter
           })
         }
         res.meow = meow
-        next()
+        meowData.meow_id = req.params.meow_id 
+        
+        MeowsService.getComments(
+          req.app.get('db'),
+          req.params.meow_id
+        )
+        .then(comments => {
+          meowData.comments = [];
+          comments.forEach(comment => {
+            meowData.comments.push(comment);
+          });
+          return res.json(meowData);
+        })
+        .catch(err => {
+          return res.json({
+            error: err.statusText
+          })
+        })
       })
       .catch(next)
-    })
-    .get((req, res, next) => {
-      res.json(MeowsService.serializeMeow(res.meow))
     })
     .delete((req, res, next) => {
       MeowsService.getById(

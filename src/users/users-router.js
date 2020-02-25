@@ -106,6 +106,36 @@ usersRouter
   usersRouter
     .route('/details')
     .all(requireAuth)
+    .get((req, res, next) => {
+      let userData = {}
+      UsersService.getUser(req.app.get('db'), req.user.user_name)
+        .then(user => {
+          if (!user) {
+            return res.status(400).json({
+              error: `That user does not exist`
+            })
+          } else {
+            userData.credentials = UsersService.serializeUser(user)
+            UsersService.getUserLikes(req.app.get('db'), req.user.user_name)
+              .then(data => {
+                console.log(data)
+                userData.likes = [];
+                data.forEach(element => {
+                  userData.likes.push(element)
+                })
+                console.log(userData)
+                return res.status(200).json(userData);
+              })
+              .catch(err => {
+                res.status(400).json({
+                  error: err.statusText
+                })
+              })
+
+          }
+        })
+
+    })
     .post(jsonBodyParser, (req, res, next) => {
 
       let userDetails = UsersService.reduceUserDetails(req.body);

@@ -16,5 +16,8 @@ INSERT INTO meows (userHandle, body)
     ('AristoCat','Last one to the litterbox is a rotten rat');
     
 
-
+INSERT INTO comments (user_name, meow_id, body)
+  VALUES
+    ('MouseHunter55', 1, 'Meow, what a meow meow'),
+    ('PurrMinator', 2, 'Puuuuuuriffic!');
   COMMIT;

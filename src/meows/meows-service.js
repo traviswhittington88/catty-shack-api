@@ -48,6 +48,11 @@ const MeowsService = {
       likeCount: meow.likecount,
       commentCount: meow.commentcount,
     }
+  },
+  getComments(db, meow_id) {
+    return db('comments')
+      .select('*')
+      .where({ meow_id })
   }
 }
 

@@ -35,6 +35,18 @@ const UsersService = {
       .returning('*')
       .then(([user]) => user)
   },
+  getUser(db, user_name) {
+    return db('catshack_users')
+      .where({ user_name })
+      .returning('*')
+      .then(([user]) => user)
+  },
+  getUserLikes(db, user_name) {
+    console.log('made it to getUserLikes')
+    return db('likes')
+      .where({ user_name })
+      .select('*')
+  },
   insertImage(db, user_name, user_image) {
     return db('catshack_users')
       .where({ user_name })
@@ -44,7 +56,6 @@ const UsersService = {
   },
   reduceUserDetails(data) {
     let userDetails = {}
-    console.log('got here', data)
     if (data.bio.trim()) userDetails.bio = data.bio;
     if (data.website.trim()) {
       // http://website.com

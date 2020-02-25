@@ -10,3 +10,26 @@ let db = [
     }
   ]
 ]
+
+const userDetails = {
+  // Redux data
+  credentials: {
+    id: '4',
+    user_name: 'Stray88',
+    dateCreated: '2020',
+    user_image: 'uploads/no-img.png',
+    bio: 'Hello I\'m Fred',
+    website: 'http://user.com',
+    location: 'Midwest US'
+  },
+  likes: [
+    {
+      userHandle: 'users',
+      meow_id: '3'
+    },
+    {
+      userHandle: 'stray88',
+      meow_id: '5'
+    }
+  ]
+};
