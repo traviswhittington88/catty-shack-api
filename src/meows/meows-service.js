@@ -44,9 +44,19 @@ const MeowsService = {
       meow_id: meow.meow_id,
       userHandle: xss(meow.userhandle),
       body: xss(meow.body),
+      user_image: xss(meow.user_image),
       date_created: new Date(meow.date_created),
       likeCount: meow.likecount,
       commentCount: meow.commentcount,
+    }
+  },
+  serializeComment(comment) {
+    return {
+      user_name: xss(comment.user_name),
+      meow_id: comment.meow_id,
+      body: xss(comment.body),
+      date_created: comment.date_created,
+      user_image: xss(comment.user_image)
     }
   },
   getComments(db, meow_id) {
@@ -54,6 +64,43 @@ const MeowsService = {
       .select('*')
       .where({ meow_id })
       .orderBy('date_created', 'desc')
+  },
+  addComment(db, newComment) {
+    return db('comments')
+    .insert(newComment)
+    .returning('*')
+    .then(rows => {
+           return rows[0]
+    })
+  },
+  getLikes(db, user_name, meow_id) {
+    return db('likes')
+      .select('*')
+      .where({ user_name, meow_id })
+      .first()
+  },
+  addLike(db, newLike) {
+    return db('likes')
+    .insert(newLike)
+    .return('*')
+    .then(rows => {
+      return rows[0]
+    })
+  },
+  incrementLikeCount(db, meow_id, likecount) {
+    return db('meows')
+      .where({ meow_id })
+      .update({ likecount })
+  },
+  removeLike(db, user_name, meow_id) {
+    return db ('likes')
+      .where({ user_name, meow_id })
+      .delete()
+  },
+  decrementLikeCount(db, meow_id, likecount) {
+    return db('meows')
+    .where({ meow_id })
+    .update({ likecount })
   }
 }
 

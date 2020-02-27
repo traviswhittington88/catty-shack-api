@@ -1,6 +1,7 @@
 BEGIN; 
 
-TRUNCATE 
+TRUNCATE
+  comments,
   meows,
   catshack_users
   RESTART IDENTITY CASCADE;
@@ -19,5 +20,13 @@ INSERT INTO meows (userHandle, body)
 INSERT INTO comments (user_name, meow_id, body)
   VALUES
     ('MouseHunter55', 1, 'Meow, what a meow meow'),
+    ('MouseHunter55', 1, 'Yea this place is legit for the kit!'),
     ('PurrMinator', 2, 'Puuuuuuriffic!');
+
+
+INSERT INTO likes (user_name, meow_id) 
+  VALUES
+    ('TomCat57', 2),
+    ('AristoCat', 1);
+    
   COMMIT;

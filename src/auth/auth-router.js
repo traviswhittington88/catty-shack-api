@@ -40,7 +40,7 @@ authRouter
             user_image: dbUser.user_image,
           })
           next()
-        })  
+        })
       })
       .catch(next)
 })
