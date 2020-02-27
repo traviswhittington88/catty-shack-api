@@ -168,24 +168,18 @@ meowsRouter
       MeowsService.getById(req.app.get('db'), req.params.meow_id)
         .then(meow => {
           if (!meow) {
-            return res.status(400).json({
-              error: `That meow does not exist`
-            })
+            return res.status(400).json({ error: `That meow does not exist`})
           }
-
-          MeowsService.addComment(req.app.get('db'), newComment)
-            .then(comment => {
-              return res.json(MeowsService.serializeComment(comment))
-            })
-            .catch(err => {
-              console.error(err)
-              return res.json({
-                error: `Something went wrong`
-              })
-            })
+          return  MeowsService.incrementCommentCount(req.app.get('db'), req.params.meow_id, meow.commentcount + 1);
+        })
+        .then(() => {
+          return MeowsService.addComment(req.app.get('db'), newComment)
+        })
+        .then(comment => {
+          return res.json(MeowsService.serializeComment(comment))
         })
         .catch(next)
-    })
+      })
 
     // Like meow
 

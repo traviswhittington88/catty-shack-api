@@ -87,6 +87,11 @@ const MeowsService = {
       return rows[0]
     })
   },
+  incrementCommentCount(db, meow_id, commentcount) {
+    return db('meows')
+      .where({ meow_id })
+      .update({ commentcount })
+  },
   incrementLikeCount(db, meow_id, likecount) {
     return db('meows')
       .where({ meow_id })
