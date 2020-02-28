@@ -123,7 +123,22 @@ usersRouter
                 data.forEach(element => {
                   userData.likes.push(element)
                 })
-                console.log(userData)
+
+                return UsersService.getUserNotifications(req.app.get('db'), req.user.user_name)
+              })
+              .then(data => {
+                userData.notifications = [];
+                data.forEach(data => {
+                  userData.notifications.push({
+                    recipient: data.recipient,
+                    sender: data.sender,
+                    read: data.read,
+                    meow_id: data.meow_id,
+                    type: data.type,
+                    date_created: data.date_created,
+                    id: data.id
+                  })
+                });
                 return res.status(200).json(userData);
               })
               .catch(err => {
@@ -156,6 +171,52 @@ usersRouter
           }
         })
     })
+
+    usersRouter
+      .route('/:userhandle')
+      .get((req, res, next) => {
+        let userData = {}
+        UsersService.getUser(req.app.get('db'), req.params.userhandle)
+          .then(user => {
+            if (!user) {
+              return res.status(400).json({
+                error: `That user does not exist`
+              })
+            } else {
+              userData.user = user
+              return UsersService.getUserMeows(req.app.get('db'), req.params.userhandle)
+            }
+          })
+          .then(meows => {
+            userData.meows = []
+            meows.forEach(meow => {
+              userData.meows.push({
+                meow_id: meow.id,
+                userhandle: meow.userhandle,
+                body: meow.body,
+                user_image: meow.user_image,
+                date_created: meow.date_created,
+                likeCount: meow.likeCount,
+                commentCount: meow.commentCount
+              })
+            })
+            return res.json(userData)
+          })
+          .catch(err => {
+            console.error(err)
+            return res.status(500).json({
+              error: err.statusText
+            })
+          })
+      })
+
+    
+    usersRouter
+      .route('/notifications')
+      .all(requireAuth)
+      .post((req, res, next) => {
+
+      })
 
 
 

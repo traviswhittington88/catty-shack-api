@@ -35,6 +35,12 @@ const UsersService = {
       .returning('*')
       .then(([user]) => user)
   },
+  getUserMeows(db, userhandle) {
+    return db('meows')
+      .where( { userhandle })
+      .select('*')
+      .orderBy('date_created', 'desc')
+  },
   getUser(db, user_name) {
     return db('catshack_users')
       .where({ user_name })
@@ -46,6 +52,13 @@ const UsersService = {
     return db('likes')
       .where({ user_name })
       .select('*')
+  },
+  getUserNotifications(db, recipient) {
+    return db('notifications')
+      .orderBy('date_created', 'desc')
+      .where({ recipient })
+      .select('*')
+      .limit(10)
   },
   insertImage(db, user_name, user_image) {
     return db('catshack_users')

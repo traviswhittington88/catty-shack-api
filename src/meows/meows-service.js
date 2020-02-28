@@ -117,7 +117,11 @@ const MeowsService = {
   },
   removeNotification(db, sender, meow_id) {
     return db('notifications')
-    .where({sender, meow_id })
+    .where({
+      sender, 
+      meow_id, 
+      type: 'like' 
+    })
     .delete()
   }
 }
