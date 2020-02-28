@@ -1,6 +1,8 @@
 BEGIN; 
 
 TRUNCATE
+  notifications,
+  likes,
   comments,
   meows,
   catshack_users
@@ -28,5 +30,5 @@ INSERT INTO likes (user_name, meow_id)
   VALUES
     ('TomCat57', 2),
     ('AristoCat', 1);
-    
+
   COMMIT;

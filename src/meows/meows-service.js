@@ -106,6 +106,19 @@ const MeowsService = {
     return db('meows')
     .where({ meow_id })
     .update({ likecount })
+  },
+  createNotification(db, newNotification) {
+    return db('notifications')
+    .insert(newNotification)
+    .return('*')
+    .then(rows => {
+      return rows[0]
+    })
+  },
+  removeNotification(db, sender, meow_id) {
+    return db('notifications')
+    .where({sender, meow_id })
+    .delete()
   }
 }
 

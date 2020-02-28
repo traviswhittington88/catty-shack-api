@@ -1,10 +1,91 @@
 const path = require('path')
+const EventEmitter = require('events').EventEmitter
 const express = require('express')
 const MeowsService = require('../meows/meows-service')
 const { requireAuth } = require('../middleware/jwt-auth')
 
 const meowsRouter = express.Router();
 const jsonBodyParser = express.json();
+const notificationEvent = new EventEmitter;
+
+notificationEvent.on('like', function(db, user_name, meow_id) {
+  console.log(`meow with id ${meow_id} was just liked!`)
+  MeowsService.getById(
+    db,
+    meow_id 
+  )
+  .then(meow => {
+    if (meow) {
+      const newNotification = {
+        recipient: meow.userhandle,
+        sender: user_name,
+        type: 'like',
+        read: false,
+        meow_id: meow.meow_id
+      }
+      return MeowsService.createNotification(
+        db, 
+        newNotification
+      )
+    }
+  })
+  .then(() => {
+    console.log('notification created sucessfully')
+    return;
+  })
+  .catch(err => {
+    console.error(err);
+    return;
+  });
+});
+
+notificationEvent.on('comment', function(db, user_name, meow_id) {
+  console.log(`meow with id ${meow_id} was just commented on!`)
+  MeowsService.getById(
+    db,
+    meow_id 
+  )
+  .then(meow => {
+    if (meow) {
+      const newNotification = {
+        recipient: meow.userhandle,
+        sender: user_name,
+        type: 'comment',
+        read: false,
+        meow_id: meow.meow_id
+      }
+      return MeowsService.createNotification(
+        db, 
+        newNotification
+      )
+    }
+  })
+  .then(() => {
+    console.log('notification created sucessfully')
+    return;
+  })
+  .catch(err => {
+    console.error(err);
+    return;
+  });
+});
+
+notificationEvent.on('delete', function(db, user_name, meow_id) {
+  console.log('delete called')
+  console.log(user_name, meow_id)
+  MeowsService.removeNotification(
+    db,
+    user_name,
+    meow_id
+  )
+  .then(() => {
+    return;
+  })
+  .catch(err => {
+    console.error(err);
+    return;
+  })
+})
 
 meowsRouter
   .route('/')
@@ -188,6 +269,7 @@ meowsRouter
           return MeowsService.addComment(req.app.get('db'), newComment)
         })
         .then(comment => {
+          notificationEvent.emit('comment', req.app.get('db'), req.user.user_name, req.params.meow_id)
           return res.json(MeowsService.serializeComment(comment))
         })
         .catch(next)
@@ -231,6 +313,7 @@ meowsRouter
                 return MeowsService.incrementLikeCount(req.app.get('db'), req.params.meow_id, meowData.likecount);
               })
               .then(() => {
+                notificationEvent.emit('like', req.app.get('db'), req.user.user_name, req.params.meow_id)
                 return res.json(meowData);
               })
               .catch(err => {
@@ -284,6 +367,7 @@ meowsRouter
               return MeowsService.incrementLikeCount(req.app.get('db'), req.params.meow_id, meowData.likecount);
             })
             .then(() => {
+              notificationEvent.emit('delete', req.app.get('db'), req.user.user_name, req.params.meow_id)
               return res.json(meowData);
             })
             .catch(err => {
