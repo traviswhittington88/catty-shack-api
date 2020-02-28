@@ -67,6 +67,7 @@ meowsRouter
             }
           })
         }
+        else {
         res.meow = meow
         meowData = meow;
         
@@ -86,6 +87,7 @@ meowsRouter
             error: err.statusText
           })
         })
+      }
       })
       .catch(next)
     })
@@ -95,7 +97,12 @@ meowsRouter
         req.params.meow_id
       )
       .then(meow => {
-        if (meow.user_id.toString() !== req.get('user_id').toString()) {
+        if (!meow) {
+          return res.status(404).json({
+            error: `Sorry that meow does not exist`
+          })
+        }
+        if (meow.userhandle !== req.user.user_name) {
           res.status(400).json({ 
             error: {
               message: `Sorry that meow does not belong to you!`
@@ -108,6 +115,11 @@ meowsRouter
             )
             .then(numOfRowsAffected => {
             res.status(204).end()
+            })
+            .catch(err => {
+              return res.status(400).json({
+                error: err.statusText
+              })
             })
           }
       })
@@ -216,7 +228,6 @@ meowsRouter
               )
               .then(() => {
                 meowData.likecount++
-                console.log(meowData)
                 return MeowsService.incrementLikeCount(req.app.get('db'), req.params.meow_id, meowData.likecount);
               })
               .then(() => {
@@ -247,7 +258,6 @@ meowsRouter
       )
       .then(meow => {
         if (meow) {
-          console.log(meow)
           meowData = meow;
           meowData.meow_id = meow.meow_id;
           return MeowsService.getLikes(
@@ -260,7 +270,6 @@ meowsRouter
         }
       })
       .then(likes => {
-        console.log(likes)
         if (!likes) {
           return res.status(400).json({ error: `Meow not liked` })
           
@@ -272,14 +281,12 @@ meowsRouter
             )
             .then(() => {
               meowData.likecount--
-              console.log(meowData)
               return MeowsService.incrementLikeCount(req.app.get('db'), req.params.meow_id, meowData.likecount);
             })
             .then(() => {
               return res.json(meowData);
             })
             .catch(err => {
-              console.error(err.code)
               return res.json({
                 error: err.statusText
               })
