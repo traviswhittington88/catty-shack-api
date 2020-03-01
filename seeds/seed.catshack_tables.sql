@@ -11,7 +11,9 @@ TRUNCATE
 INSERT INTO catshack_users (user_name, password)
   VALUES
     ('MouseHunter55', 'iLoveMeece100$$'),
-    ('PurrMinator', 'fatcatslovefood');
+    ('PurrMinator', 'fatcatslovefood'),
+    ('TomCat57', 'AAaa11$$'),
+    ('AristoCat', 'AAaa11$$');
 
 INSERT INTO meows (userHandle, body)
   VALUES 

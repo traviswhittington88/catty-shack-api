@@ -34,10 +34,21 @@ const MeowsService = {
       .where({ meow_id })
       .delete()
   },
-  updateMeow(db, meow_id, newMeowFields) {
+  updateMeowImage(db, userhandle, user_image) {
     return db('meows')
-      .where({ meow_id })
-      .update(newMeowFields)
+      .where('userhandle', userhandle)
+      .update('user_image', user_image)
+      .then(() => {
+        return;
+      })
+  },
+  updateCommentsImage(db, user_name, user_image) {
+    return db('comments')
+      .where('user_name', user_name)
+      .update('user_image', user_image)
+      .then(() => {
+        return;
+      })
   },
   serializeMeow(meow) {
     return {
@@ -76,8 +87,16 @@ const MeowsService = {
   getLikes(db, user_name, meow_id) {
     return db('likes')
       .select('*')
-      .where({ user_name, meow_id })
+      .where({ 
+        user_name: user_name,
+        meow_id: meow_id
+       })
       .first()
+  },
+  getAllLikes(db, meow_id) {
+    return db('likes')
+    .select('*')
+    .where({ meow_id })
   },
   addLike(db, newLike) {
     return db('likes')
@@ -102,10 +121,23 @@ const MeowsService = {
       .where({ user_name, meow_id })
       .delete()
   },
+  deleteLike(db, id) {
+    return db('likes')
+      .where({ id })
+      .delete()
+      .then(() => {
+        return;
+      })
+  },
   decrementLikeCount(db, meow_id, likecount) {
     return db('meows')
     .where({ meow_id })
     .update({ likecount })
+  },
+  getNotifications(db, meow_id) {
+    return db('notifications')
+      .select('*')
+      .where({ meow_id })
   },
   createNotification(db, newNotification) {
     return db('notifications')
@@ -113,6 +145,14 @@ const MeowsService = {
     .return('*')
     .then(rows => {
       return rows[0]
+    })
+  },
+  deleteNotification(db, id) {
+    return db('notifications')
+    .where({ id })
+    .delete()
+    .then(() => {
+      return;
     })
   },
   removeNotification(db, sender, meow_id) {
@@ -123,6 +163,14 @@ const MeowsService = {
       type: 'like' 
     })
     .delete()
+  },
+  deleteComment(db, id) {
+    return db('comments')
+      .where({ id })
+      .delete()
+      .then(() => {
+        return;
+      })
   }
 }
 

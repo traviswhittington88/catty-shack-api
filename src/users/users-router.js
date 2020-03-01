@@ -1,6 +1,8 @@
 const express = require('express')
 const { requireAuth } = require('../middleware/jwt-auth')
+const EventEmitter = require('events').EventEmitter
 const UsersService = require('../users/users-service')
+const MeowsService = require('../meows/meows-service')
 const path = require('path')
 const multer = require('multer')
 const storage = multer.diskStorage({
@@ -32,6 +34,25 @@ const upload = multer({ storage: storage, limits: {
 
 const usersRouter = express.Router()
 const jsonBodyParser = express.json()
+const changeImageEvent = new EventEmitter
+
+changeImageEvent.on('update', function(db, userhandle, newImage) {
+  UsersService.getUser(db, userhandle)
+    .then(user => {
+      if (user && user.user_image === newImage) {
+        MeowsService.updateMeowImage(db, userhandle, newImage)
+          .then(() => {
+            MeowsService.updateCommentsImage(db, userhandle, newImage)
+          })
+          .catch(err => {
+            console.error(err)
+          })
+      } 
+    })
+    .catch(err => {
+      console.error(err)
+    })
+})
 
 usersRouter
   .post('/', jsonBodyParser, (req, res, next) => {
@@ -96,9 +117,15 @@ usersRouter
         req.file.path,
       )
       .then(user => {
-        res.status(201)
-        .json(UsersService.serializeUser(user))
-      }) 
+        changeImageEvent.emit('update', req.app.get('db'), user.user_name, user.user_image) //updates image url in all tables containing the image
+        return res.status(201).json(UsersService.serializeUser(user))
+      })
+      .catch(err => {
+        return res.status(500).json({
+          error: `Something went wrong`
+        })
+      })
+      .catch(next)
     })
 
   // Add user details
@@ -191,13 +218,13 @@ usersRouter
             userData.meows = []
             meows.forEach(meow => {
               userData.meows.push({
-                meow_id: meow.id,
+                meow_id: meow.meow_id,
                 userhandle: meow.userhandle,
                 body: meow.body,
                 user_image: meow.user_image,
                 date_created: meow.date_created,
-                likeCount: meow.likeCount,
-                commentCount: meow.commentCount
+                likeCount: meow.likecount,
+                commentCount: meow.commentcount
               })
             })
             return res.json(userData)
@@ -208,15 +235,29 @@ usersRouter
               error: err.statusText
             })
           })
+          .catch(next)
       })
 
     
     usersRouter
       .route('/notifications')
       .all(requireAuth)
-      .post((req, res, next) => {
-
+      .post(jsonBodyParser, (req, res, next) => {
+        req.body.forEach(notificationId => {
+          UsersService.markNotificationRead(req.app.get('db'), notificationId)
+          .then(() => {
+            return;
+          })
+          .catch(err => {
+            console.error(err);
+            return res.json({
+              error: err.statusText
+            })
+          })
+        })
+        return res.json(`Notifications marked read`)
       })
+
 
 
 

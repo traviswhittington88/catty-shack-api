@@ -3,10 +3,10 @@ const EventEmitter = require('events').EventEmitter
 const express = require('express')
 const MeowsService = require('../meows/meows-service')
 const { requireAuth } = require('../middleware/jwt-auth')
-
 const meowsRouter = express.Router();
 const jsonBodyParser = express.json();
 const notificationEvent = new EventEmitter;
+const meowDeleteEvent = new EventEmitter;
 
 notificationEvent.on('like', function(db, user_name, meow_id) {
   console.log(`meow with id ${meow_id} was just liked!`)
@@ -15,7 +15,7 @@ notificationEvent.on('like', function(db, user_name, meow_id) {
     meow_id 
   )
   .then(meow => {
-    if (meow) {
+    if (meow && meow.userhandle !== user_name) {
       const newNotification = {
         recipient: meow.userhandle,
         sender: user_name,
@@ -23,19 +23,20 @@ notificationEvent.on('like', function(db, user_name, meow_id) {
         read: false,
         meow_id: meow.meow_id
       }
-      return MeowsService.createNotification(
+      MeowsService.createNotification(
         db, 
         newNotification
       )
+      .then(() => {
+        console.log('Notification created successfully')
+      })
+      .catch(err => {
+        console.log(err)
+      })
     }
-  })
-  .then(() => {
-    console.log('notification created sucessfully')
-    return;
   })
   .catch(err => {
     console.error(err);
-    return;
   });
 });
 
@@ -46,7 +47,7 @@ notificationEvent.on('comment', function(db, user_name, meow_id) {
     meow_id 
   )
   .then(meow => {
-    if (meow) {
+    if (meow && meow.userhandle !== user_name) {
       const newNotification = {
         recipient: meow.userhandle,
         sender: user_name,
@@ -86,7 +87,63 @@ notificationEvent.on('delete', function(db, user_name, meow_id) {
     return;
   })
 })
+// remove related  comments, likes & notifications when meow is deleted
+meowDeleteEvent.on('delete', function(db, meow_id, user_name) {
+  console.log(meow_id, user_name)
+  MeowsService.getComments(db, meow_id) 
+    .then(comments => {
+      if (Array.isArray(comments) && comments.length) {
+        comments.forEach(comment => {
+          MeowsService.deleteComment(db, comment.id)
+        })
+        console.log('All comments deleted')
+      } else {
+        console.log('No comments to remove')
+        }
+    })
+    .catch(err => {
+      console.log(err) 
+    })
 
+    MeowsService.getAllLikes(db, meow_id)
+        .then(likes => {
+          console.log(likes, likes.length)
+          if (Array.isArray(likes) && likes.length) {
+            likes.forEach(like => {
+              MeowsService.deleteLike(db, like.id)
+            })
+          } else {
+            console.log('No likes to delete for meow')
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+
+    MeowsService.getNotifications(db, meow_id)
+        .then(notifications => {
+          console.log(notifications)
+          if (Array.isArray(notifications) && notifications.length) {
+            notifications.forEach(notification => {
+              MeowsService.deleteNotification(db, notification.id)
+            })
+            console.log('All notifications deleted for this meow')
+          } else {
+            console.log('No notifications to remove for this meow')
+          }
+        })
+        .then(() => {
+          return;
+        })
+        .catch(err => {
+          console.error(err)
+        })
+  })
+    
+  
+  
+// get all meows
+// post a meow
 meowsRouter
   .route('/')
   .all(requireAuth)
@@ -130,6 +187,8 @@ meowsRouter
     .catch(next)
   })
 
+  // get meow by id
+  // delete meow by id
   meowsRouter
     .route('/:meow_id')
     .all(requireAuth)
@@ -195,7 +254,10 @@ meowsRouter
               req.params.meow_id
             )
             .then(numOfRowsAffected => {
-            res.status(204).end()
+              meowDeleteEvent.emit('delete', req.app.get('db'), req.params.meow_id, req.user.user_name)
+            })
+            .then(() => {
+              return res.status(204).end()
             })
             .catch(err => {
               return res.status(400).json({
@@ -372,7 +434,7 @@ meowsRouter
             })
             .catch(err => {
               return res.json({
-                error: err.statusText
+                error: `Oops something went wrong!`
               })
             })
         }

@@ -60,6 +60,11 @@ const UsersService = {
       .select('*')
       .limit(10)
   },
+  markNotificationRead(db, id) {
+    return db('notifications')
+      .where({ id })
+      .update({ read: true })
+  }, 
   insertImage(db, user_name, user_image) {
     return db('catshack_users')
       .where({ user_name })
