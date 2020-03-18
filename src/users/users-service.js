@@ -1,79 +1,79 @@
-const xss = require('xss')
-const bcrypt = require('bcryptjs')
+const xss = require('xss');
+const bcrypt = require('bcryptjs');
 
-const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/
+const REGEX_UPPER_LOWER_NUMBER_SPECIAL = /(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&])[\S]+/;
 
 const UsersService = {
   verifyPassword(password) {
     if (password.length < 8) {
-      return `Password must be at least 8 characters`
+      return `Password must be at least 8 characters`;
     }
     if (password.length > 72) {
-      return `Password must be less than 73 characters`
+      return `Password must be less than 73 characters`;
     }
     if (password.startsWith(' ') || password.endsWith(' ')) {
-      return `Password must not start or end with spaces`
+      return `Password must not start or end with spaces`;
     }
     if (!REGEX_UPPER_LOWER_NUMBER_SPECIAL.test(password)) {
-      return `Password must contain 1 upper case, lower case, number and special character`
+      return `Password must contain 1 upper case, lower case, number and special character`;
     }
-    return null
+    return null;
   },
   hashPassword(password) {
-    return bcrypt.hash(password, 12)
+    return bcrypt.hash(password, 12);
   },
   hasUserWithUserName(db, user_name) {
     return db('catshack_users')
       .where({ user_name })
       .first()
-      .then(user => !!user)
+      .then(user => !!user);
   },
   insertUser(db, newUser) {
     return db
       .insert(newUser)
       .into('catshack_users')
       .returning('*')
-      .then(([user]) => user)
+      .then(([user]) => user);
   },
   getUserMeows(db, userhandle) {
     return db('meows')
-      .where( { userhandle })
+      .where({ userhandle })
       .select('*')
-      .orderBy('date_created', 'desc')
+      .orderBy('date_created', 'desc');
   },
   getUser(db, user_name) {
     return db('catshack_users')
       .where({ user_name })
       .returning('*')
-      .then(([user]) => user)
+      .then(([user]) => user);
   },
   getUserLikes(db, user_name) {
-    console.log('made it to getUserLikes')
+    console.log('made it to getUserLikes');
     return db('likes')
       .where({ user_name })
-      .select('*')
+      .select('*');
   },
   getUserNotifications(db, recipient) {
     return db('notifications')
       .orderBy('date_created', 'desc')
       .where({ recipient })
       .select('*')
-      .limit(10)
+      .limit(10);
   },
   markNotificationRead(db, id) {
     return db('notifications')
       .where({ id })
-      .update({ read: true })
-  }, 
+      .update({ read: true });
+  },
   insertImage(db, user_name, user_image) {
     return db('catshack_users')
       .where({ user_name })
       .update({ user_image })
       .returning('*')
-      .then(([user]) => user)
+      .then(([user]) => user);
   },
   reduceUserDetails(data) {
-    let userDetails = {}
+    let userDetails = {};
     if (data.bio.trim()) userDetails.bio = data.bio;
     if (data.website.trim()) {
       // http://website.com
@@ -83,14 +83,14 @@ const UsersService = {
     }
     if (data.location.trim()) userDetails.location = data.location;
 
-    return userDetails; 
+    return userDetails;
   },
   insertUserDetails(db, user_name, user_details) {
     return db('catshack_users')
       .where({ user_name })
-      .update(user_details )
+      .update(user_details)
       .returning('*')
-      .then(([user]) => user)
+      .then(([user]) => user);
   },
   serializeUser(user) {
     return {
@@ -101,8 +101,8 @@ const UsersService = {
       bio: xss(user.bio),
       location: xss(user.location),
       website: xss(user.website)
-    }
+    };
   }
-}
+};
 
-module.exports = UsersService
+module.exports = UsersService;

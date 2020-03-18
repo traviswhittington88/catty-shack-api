@@ -1,7 +1,7 @@
 const path = require('path')
 const EventEmitter = require('events').EventEmitter
 const express = require('express')
-const MeowsService = require('../meows/meows-service')
+const MeowsService = require('./meows-service')
 const { requireAuth } = require('../middleware/jwt-auth')
 const meowsRouter = express.Router();
 const jsonBodyParser = express.json();
@@ -150,7 +150,7 @@ meowsRouter
   .get((req, res, next) => {
     MeowsService.getAllMeows(req.app.get('db'))
       .then(meows => {
-        res.json(meows.map(MeowsService.serializeMeow))
+        return res.json(meows.map(MeowsService.serializeMeow))
       })
       .catch(next)
   })
@@ -335,6 +335,28 @@ meowsRouter
           return res.json(MeowsService.serializeComment(comment))
         })
         .catch(next)
+      })
+
+    // return all likes
+
+    meowsRouter
+      .route('/:meow_id/likes')
+      .all(requireAuth)
+      .get((req, res, next) => {
+        MeowsService.getAllLikes(req.app.get('db'), req.params.meow_id)
+          .then(likes => {
+            if (!likes) {
+              return res.status(400).send('no likes for this meow')
+            } else {
+              return res.status(200).json(likes)
+            }
+          })
+          .catch(error => {
+            return res.status(400).json({ 
+              error: error.message,
+            })
+          })
+          .catch(next)
       })
 
     // Like meow

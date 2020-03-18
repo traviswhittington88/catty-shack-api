@@ -6,4 +6,4 @@ CREATE TABLE meows (
     date_created TIMESTAMP DEFAULT now() NOT NULL,
     likeCount INTEGER DEFAULT 0 NOT NULL,
     commentCount INTEGER DEFAULT 0 NOT NULL
-);
+);  
