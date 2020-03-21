@@ -193,19 +193,19 @@ usersRouter
     });
   });
 
-usersRouter.route('/:userhandle').get((req, res, next) => {
+usersRouter.route('/:user_name').get((req, res, next) => {
   let userData = {};
-  UsersService.getUser(req.app.get('db'), req.params.userhandle)
+  UsersService.getUser(req.app.get('db'), req.params.user_name)
     .then(user => {
       if (!user) {
         return res.status(400).json({
           error: `That user does not exist`
         });
       } else {
-        userData.user = user;
+        userData.user = UsersService.serializeUser(user);
         return UsersService.getUserMeows(
           req.app.get('db'),
-          req.params.userhandle
+          req.params.user_name
         );
       }
     })
@@ -214,7 +214,7 @@ usersRouter.route('/:userhandle').get((req, res, next) => {
       meows.forEach(meow => {
         userData.meows.push({
           meow_id: meow.meow_id,
-          userhandle: meow.userhandle,
+          userHandle: meow.userhandle,
           body: meow.body,
           user_image: meow.user_image,
           date_created: meow.date_created,
@@ -222,6 +222,7 @@ usersRouter.route('/:userhandle').get((req, res, next) => {
           commentCount: meow.commentcount
         });
       });
+      console.log(userData);
       return res.json(userData);
     })
     .catch(err => {
