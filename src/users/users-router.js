@@ -142,7 +142,6 @@ usersRouter
         userData.credentials = UsersService.serializeUser(user);
         UsersService.getUserLikes(req.app.get('db'), req.user.user_name)
           .then(data => {
-            console.log(data);
             userData.likes = [];
             data.forEach(element => {
               userData.likes.push(element);
@@ -222,7 +221,6 @@ usersRouter.route('/:user_name').get((req, res, next) => {
           commentCount: meow.commentcount
         });
       });
-      console.log(userData);
       return res.json(userData);
     })
     .catch(err => {
@@ -239,7 +237,6 @@ usersRouter
   .all(requireAuth)
   .get((req, res, next) => {
     let userData = {};
-    console.log(req.user.user_name);
     UsersService.getUser(req.app.get('db'), req.user.user_name)
       .then(user => {
         if (!user) {

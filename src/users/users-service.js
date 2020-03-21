@@ -48,7 +48,6 @@ const UsersService = {
       .then(([user]) => user);
   },
   getUserLikes(db, user_name) {
-    console.log('made it to getUserLikes');
     return db('likes')
       .where({ user_name })
       .select('*');
