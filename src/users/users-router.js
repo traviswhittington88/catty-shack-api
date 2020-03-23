@@ -104,6 +104,7 @@ usersRouter
   .route('/image')
   .all(requireAuth)
   .post(jsonBodyParser, upload.single('profileImage'), (req, res, next) => {
+    console.log(req.file.path);
     UsersService.insertImage(
       req.app.get('db'),
       req.user.user_name,

@@ -10,6 +10,7 @@ TRUNCATE
 
 INSERT INTO catshack_users (user_name, password, user_image, location, bio)
   VALUES
+    ('defaultUser', '$2a$04$TwMhdSmO7iE1zDuBAcnnUe.hp5evXCbQCsSxnN3GNgm38hbFZG35O', 'uploads/defaultUser.jpg', 'Nowheresville, KY', 'Just a chill kitten'),
     ('MouseHunter55', 'iLoveMeece100$$', 'uploads/no-img.png', 'Moonshine Holler, WV', 'Like to chase meece in my spare time'),
     ('PurrMinator', 'fatcatslovefood', 'uploads/no-img.png','Branson, MS', 'Love to stretch out and get my sosh on'),
     ('TomCat57', 'AAaa11$$', 'uploads/no-img.png', 'New Mexico, NM', 'Stray Life is the good life'),
