@@ -23,6 +23,7 @@ const UsersService = {
     return bcrypt.hash(password, 12);
   },
   hasUserWithUserName(db, user_name) {
+    console.log('in hasUserWith...', user_name);
     return db('catshack_users')
       .where({ user_name })
       .first()

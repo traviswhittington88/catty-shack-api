@@ -25,7 +25,7 @@ function makeUser() {
         commentCount: 4
       },
       {
-        meow_id: 4,
+        meow_id: 7,
         userhandle: 'twhitty89',
         body: 'Meow from twhitty89',
         user_image:

@@ -72,7 +72,7 @@ usersRouter.post('/', jsonBodyParser, (req, res, next) => {
     });
   }
 
-  UsersService.hasUserWithUserName(req.app.get('db'), user_name)
+  UsersService.hasUserWithUserName(req.app.get('db'), req.body.user_name)
     .then(hasUserWithUserName => {
       if (hasUserWithUserName) {
         return res.status(400).json({

@@ -31,7 +31,7 @@ describe('Auth endpoints', () => {
         user_name: testUser.user_name,
         password: testUser.password
       };
-      console.log('loginAttemptBody', loginAttemptBody);
+
       it(`responds 400 required error when ${field} is missing`, () => {
         delete loginAttemptBody[field];
         console.log(loginAttemptBody);
