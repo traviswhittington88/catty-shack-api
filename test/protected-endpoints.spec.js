@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 const helpers = require('./test-helpers');
 const app = require('../src/app');
 
-describe.only(`Protected endpoints`, () => {
+describe(`Protected endpoints`, () => {
   let db;
 
   const {
