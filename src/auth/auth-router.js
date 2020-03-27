@@ -43,6 +43,7 @@ authRouter.post('/login', jsonBodyParser, (req, res, next) => {
 });
 
 authRouter.post('/refresh', requireAuth, (req, res) => {
+  console.log('in refresh');
   const sub = req.user.user_name;
   const payload = { user_id: req.user.id };
 

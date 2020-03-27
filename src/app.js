@@ -17,6 +17,12 @@ app.use('/uploads', express.static('uploads'));
 app.use(helmet());
 app.use(cors());
 
+/* test path
+app.use('/', (req, res, next) => {
+  return res.status(200).send('Hello, world');
+  next();
+}); */
+// production paths
 app.use('/api/meows', meowsRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/users', usersRouter);
