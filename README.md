@@ -81,7 +81,7 @@ returns status 201 and new entry object
 returns 204 (no content) status
 
 
-## Try to delete same meow again
+## Attempt To Delete The Same Meow
 
 ### Request
 
@@ -96,7 +96,7 @@ returns status 404 (not found)
     {"status":404,"reason":"Not found"}
     
  
-## Get a specific meow
+## Get A Specific Meow
 
 ### Request
 
@@ -206,7 +206,7 @@ responds with 201 (created) status and comment
     "commentcount": 0
 }`
 
-## Like A Meow
+## Unlike A Meow
 
 ### Request
 
