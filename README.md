@@ -131,7 +131,7 @@ returns status 200 (ok) and journal object
 ### Response
 
 The response for all journals will be an array of journal objects in json format
-
+`
 [
     {
         "meow_id": 4,
@@ -160,7 +160,7 @@ The response for all journals will be an array of journal objects in json format
         "likeCount": 0,
         "commentCount": 0
     }
-]
+] `
 
 ## Post A Comment
 
@@ -178,13 +178,13 @@ The response for all journals will be an array of journal objects in json format
 
 responds with 201 (created) status and comment
 
-  {
+`  {
     "user_name": "twhitty89",
     "meow_id": 2,
     "body": "Yo Aristocat.. it's your boy twhitty89",
     "date_created": "2020-03-17T00:56:12.809Z",
     "user_image": "uploads/2020-03-16T19:53:26.746Zgrey-fur-kitten-127028.jpg"
-}
+}`
 
 ## Like A Meow
 
@@ -196,7 +196,7 @@ responds with 201 (created) status and comment
     
 ### Response
 
-{
+`{
     "meow_id": 3,
     "userhandle": "twhitty89",
     "body": "Meow from twhitty89",
@@ -204,7 +204,7 @@ responds with 201 (created) status and comment
     "date_created": "2020-03-15T08:11:46.722Z",
     "likecount": 1,
     "commentcount": 0
-}
+}`
 
 ## Like A Meow
 
@@ -216,7 +216,7 @@ responds with 201 (created) status and comment
     
 ### Response
 
-{
+`{
     "meow_id": 3,
     "userhandle": "twhitty89",
     "body": "Meow from twhitty89",
@@ -224,6 +224,6 @@ responds with 201 (created) status and comment
     "date_created": "2020-03-15T08:11:46.722Z",
     "likecount": 0,
     "commentcount": 0
-}
+}`
 
 
