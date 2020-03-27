@@ -21,8 +21,8 @@ function makeUser() {
         user_image:
           'uploads/2020-03-16T19:53:26.746Zgrey-fur-kitten-127028.jpg',
         date_created: '2020-03-18T05:59:51.915Z',
-        likeCount: 1,
-        commentCount: 4
+        likecount: 1,
+        commentcount: 4
       },
       {
         meow_id: 7,
@@ -31,8 +31,8 @@ function makeUser() {
         user_image:
           'uploads/2020-03-16T19:53:26.746Zgrey-fur-kitten-127028.jpg',
         date_created: '2020-03-17T00:52:59.841Z',
-        likeCount: 0,
-        commentCount: 0
+        likecount: 0,
+        commentcount: 0
       }
     ]
   };
@@ -126,7 +126,7 @@ function makeNotificationsArray() {
       date_created: new Date('2020-02-22T16:28:33.617Z')
     },
     {
-      id: 1,
+      id: 3,
       recipient: 'test-user-2',
       sender: 'test-user-3',
       read: false,
@@ -135,7 +135,7 @@ function makeNotificationsArray() {
       date_created: new Date('2020-02-22T16:28:33.617Z')
     },
     {
-      id: 1,
+      id: 4,
       recipient: 'test-user-3',
       sender: 'test-user-4',
       read: false,
@@ -171,48 +171,48 @@ function makeMeowsArray() {
   return [
     {
       meow_id: 1,
-      userHandle: 'test-user-1',
+      userhandle: 'test-user-1',
       body: 'woo haaaaa',
       user_image: 'images/no-image.png',
       date_created: new Date('2029-01-22T16:28:32.615Z'),
-      likeCount: 0,
-      commentCount: 0
+      likecount: 0,
+      commentcount: 0
     },
     {
       meow_id: 2,
-      userHandle: 'test-user-2',
+      userhandle: 'test-user-2',
       body: 'love the post bro',
       user_image: 'images/no-image.png',
       date_created: new Date('2029-01-22T16:28:32.615Z'),
-      likeCount: 0,
-      commentCount: 0
+      likecount: 0,
+      commentcount: 0
     },
     {
       meow_id: 3,
-      userHandle: 'test-user-3',
+      userhandle: 'test-user-3',
       body: 'nice comment!',
       user_image: 'images/no-image.png',
       date_created: new Date('2029-01-22T16:28:32.615Z'),
-      likeCount: 0,
-      commentCount: 0
+      likecount: 0,
+      commentcount: 0
     },
     {
       meow_id: 4,
-      userHandle: 'test-user-4',
+      userhandle: 'test-user-4',
       body: 'fun place!',
       user_image: 'images/no-image.png',
       date_created: new Date('2029-01-22T16:28:32.615Z'),
-      likeCount: 0,
-      commentCount: 0
+      likecount: 0,
+      commentcount: 0
     },
     {
       meow_id: 5,
-      userHandle: 'test-user-5',
+      userhandle: 'test-user-5',
       body: 'Hey!',
       user_image: 'images/no-image.png',
       date_created: new Date('2029-01-22T16:28:32.615Z'),
-      likeCount: 0,
-      commentCount: 0
+      likecount: 0,
+      commentcount: 0
     }
   ];
 }
@@ -311,10 +311,11 @@ function seedCattyShackTables(
   // use a transaction to group the queries and auto rollback on any failure
   return db.transaction(async trx => {
     await seedUsers(trx, users);
+    console.log('meows has length,', meows.length);
     if (meows.length) {
       await trx.into('meows').insert(meows);
-      await trx.raw(`SELECT setval('meow_id_seq', ?)`, [
-        meows[meows.length - 1].id
+      await trx.raw(`SELECT setval('meows_meow_id_seq', ?)`, [
+        meows[meows.length - 1].meow_id
       ]);
     }
     await trx.into('likes').insert(likes);
@@ -346,6 +347,7 @@ function makeAuthHeader(user, secret = process.env.JWT_SECRET) {
 
 module.exports = {
   makeUser,
+  makeLikesArray,
   makeUserDetails,
   makeUsersArray,
   makeMeowsArray,
